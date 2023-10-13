@@ -7,10 +7,12 @@ import time
 
 class Main:
     def __init__(self):
+        """Setup environment variables and default values."""
         self._hub_connection = None
         self.HOST = None  # Setup your host here
         self.TOKEN = None  # Setup your token here
-        self.TICKETS = None  # Setup your tickets here
+
+        self.TICKETS = 1  # Setup your tickets here
         self.T_MAX = None  # Setup your max temperature here
         self.T_MIN = None  # Setup your min temperature here
         self.DATABASE = None  # Setup your database here
@@ -20,17 +22,20 @@ class Main:
             self._hub_connection.stop()
 
     def setup(self):
-        self.setSensorHub()
+        """Setup Oxygen CS."""
+        self.set_sensorhub()
 
     def start(self):
+        """Start Oxygen CS."""
         self.setup()
         self._hub_connection.start()
 
-        print("Press CTRL+C to exit.")
+        print("Press CTRL+C to exit.", flush=True)
         while True:
             time.sleep(2)
 
-    def setSensorHub(self):
+    def set_sensorhub(self):
+        """Configure hub connection and subscribe to sensor data events."""
         self._hub_connection = (
             HubConnectionBuilder()
             .with_url(f"{self.HOST}/SensorHub?token={self.TOKEN}")
@@ -46,33 +51,38 @@ class Main:
             .build()
         )
 
-        self._hub_connection.on("ReceiveSensorData", self.onSensorDataReceived)
-        self._hub_connection.on_open(lambda: print("||| Connection opened."))
-        self._hub_connection.on_close(lambda: print("||| Connection closed."))
-        self._hub_connection.on_error(lambda data: print(f"||| An exception was thrown closed: {data.error}"))
+        self._hub_connection.on("ReceiveSensorData", self.on_sensor_data_received)
+        self._hub_connection.on_open(lambda: print("||| Connection opened.", flush=True))
+        self._hub_connection.on_close(lambda: print("||| Connection closed.", flush=True))
+        self._hub_connection.on_error(
+            lambda data: print(f"||| An exception was thrown closed: {data.error}", flush=True)
+        )
 
-    def onSensorDataReceived(self, data):
+    def on_sensor_data_received(self, data):
+        """Callback method to handle sensor data on reception."""
         try:
-            print(data[0]["date"] + " --> " + data[0]["data"])
+            print(data[0]["date"] + " --> " + data[0]["data"], flush=True)
             date = data[0]["date"]
-            dp = float(data[0]["data"])
-            self.send_temperature_to_fastapi(date, dp)
-            self.analyzeDatapoint(date, dp)
+            temperature = float(data[0]["data"])
+            self.take_action(temperature)
         except Exception as err:
-            print(err)
+            print(err, flush=True)
 
-    def analyzeDatapoint(self, date, data):
-        if float(data) >= float(self.T_MAX):
-            self.sendActionToHvac(date, "TurnOnAc", self.TICKETS)
-        elif float(data) <= float(self.T_MIN):
-            self.sendActionToHvac(date, "TurnOnHeater", self.TICKETS)
+    def take_action(self, temperature):
+        """Take action to HVAC depending on current temperature."""
+        if float(temperature) >= float(self.T_MAX):
+            self.send_action_to_hvac("TurnOnAc")
+        elif float(temperature) <= float(self.T_MIN):
+            self.send_action_to_hvac("TurnOnHeater")
 
-    def sendActionToHvac(self, date, action, nbTick):
-        r = requests.get(f"{self.HOST}/api/hvac/{self.TOKEN}/{action}/{nbTick}")
+    def send_action_to_hvac(self, action):
+        """Send action query to the HVAC service."""
+        r = requests.get(f"{self.HOST}/api/hvac/{self.TOKEN}/{action}/{self.TICKETS}")
         details = json.loads(r.text)
-        print(details)
+        print(details, flush=True)
 
     def send_event_to_database(self, timestamp, event):
+        """Save sensor data into database."""
         try:
             # To implement
             pass
