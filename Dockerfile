@@ -1,14 +1,18 @@
-# Utilisez une image Python officielle
-FROM python:3.8
+# Étape 1 : Utilisez une image Alpine Linux légère
+FROM python:3.9-alpine as builder
 
-# Définissez le répertoire de travail
+# Étape 2 : Copiez le code source et installez les dépendances
 WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Copiez les fichiers Python dans le conteneur
-COPY . .
+# Étape 3 : Supprimez les fichiers temporaires
+RUN rm -rf /root/.cache
 
-# Installez les dépendances Python (si nécessaire)
-# RUN pip install -r requirements.txt
+# Étape 4 : Image finale légère
+FROM python:3.9-alpine
+WORKDIR /app
+COPY --from=builder /app /app
 
-# Exécutez le script Python au démarrage
-CMD ["python", "main.py"]
+# Exécutez votre application
+CMD ["python", "app.py"]
