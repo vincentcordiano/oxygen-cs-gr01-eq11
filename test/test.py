@@ -10,6 +10,7 @@ sys.path.append(src_dir)
 
 from main import Main
 
+
 class TestMain(unittest.TestCase):
     def setUp(self):
         self.main = Main()
@@ -43,7 +44,7 @@ class TestMain(unittest.TestCase):
         self.main.take_action(temperature, date)
         self.main.send_action_to_hvac.assert_not_called()
 
-    @patch('requests.get')
+    @patch("requests.get")
     def test_send_action_to_hvac(self, mock_requests_get):
         action = "TurnOnAc"
         date = "2023-01-01"
@@ -56,9 +57,11 @@ class TestMain(unittest.TestCase):
         self.main.send_action_to_hvac(action, date)
 
         self.main.send_event_to_database.assert_called_with(action, date)
-        mock_requests_get.assert_called_with(f"{self.main.HOST}/api/hvac/{self.main.TOKEN}/{action}/{self.main.TICKETS}")
+        mock_requests_get.assert_called_with(
+            f"{self.main.HOST}/api/hvac/{self.main.TOKEN}/{action}/{self.main.TICKETS}"
+        )
 
-    @patch('psycopg2.connect')
+    @patch("psycopg2.connect")
     def test_send_temperature_to_database(self, mock_psycopg2_connect):
         temperature = 5
         date = "2023-01-01"
@@ -69,12 +72,15 @@ class TestMain(unittest.TestCase):
         self.main.send_temperature_to_database(temperature, date)
 
         mock_psycopg2_connect.assert_called_with(**self.main.DATABASE)
-        mock_cursor.execute.assert_called_with("INSERT INTO Temperatures (temperature, time) VALUES (%s, %s);", (temperature, date))
+        mock_cursor.execute.assert_called_with(
+            "INSERT INTO Temperatures (temperature, time) VALUES (%s, %s);",
+            (temperature, date),
+        )
         mock_conn.commit.assert_called()
         mock_cursor.close.assert_called()
         mock_conn.close.assert_called()
 
-    @patch('psycopg2.connect')
+    @patch("psycopg2.connect")
     def test_send_event_to_database(self, mock_psycopg2_connect):
         action = "TurnOnAc"
         date = "2023-01-01"
@@ -85,10 +91,13 @@ class TestMain(unittest.TestCase):
         self.main.send_event_to_database(action, date)
 
         mock_psycopg2_connect.assert_called_with(**self.main.DATABASE)
-        mock_cursor.execute.assert_called_with("INSERT INTO Evenements (action, time) VALUES (%s, %s);", (action, date))
+        mock_cursor.execute.assert_called_with(
+            "INSERT INTO Evenements (action, time) VALUES (%s, %s);", (action, date)
+        )
         mock_conn.commit.assert_called()
         mock_cursor.close.assert_called()
         mock_conn.close.assert_called()
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()
