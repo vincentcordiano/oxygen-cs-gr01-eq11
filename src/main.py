@@ -5,22 +5,23 @@ import json
 import time
 import psycopg2
 
+
 class Main:
     def __init__(self):
         """Setup environment variables and default values."""
         self._hub_connection = None
-        self.HOST = 'https://hvac-simulator-a23-y2kpq.ondigitalocean.app'  # Setup your host here
-        self.TOKEN = 'S280fa8qyp'  # Setup your token here
+        self.HOST = "https://hvac-simulator-a23-y2kpq.ondigitalocean.app"  # Setup your host here
+        self.TOKEN = "S280fa8qyp"  # Setup your token here
 
         self.TICKETS = 2  # Setup your tickets here
         self.T_MAX = 10  # Setup your max temperature here
         self.T_MIN = 0  # Setup your min temperature here
         self.DATABASE = {
-            'dbname': 'log680',
-            'user': 'postgres',
-            'password': 'postgres',
-            'host': 'localhost',
-            'port': '5432'  # Usually 5432 for PostgreSQL
+            "dbname": "log680",
+            "user": "postgres",
+            "password": "postgres",
+            "host": "localhost",
+            "port": "5432",  # Usually 5432 for PostgreSQL
         }
 
     def __del__(self):
@@ -58,10 +59,16 @@ class Main:
         )
 
         self._hub_connection.on("ReceiveSensorData", self.on_sensor_data_received)
-        self._hub_connection.on_open(lambda: print("||| Connection opened.", flush=True))
-        self._hub_connection.on_close(lambda: print("||| Connection closed.", flush=True))
+        self._hub_connection.on_open(
+            lambda: print("||| Connection opened.", flush=True)
+        )
+        self._hub_connection.on_close(
+            lambda: print("||| Connection closed.", flush=True)
+        )
         self._hub_connection.on_error(
-            lambda data: print(f"||| An exception was thrown closed: {data.error}", flush=True)
+            lambda data: print(
+                f"||| An exception was thrown closed: {data.error}", flush=True
+            )
         )
 
     def on_sensor_data_received(self, data):
@@ -94,7 +101,9 @@ class Main:
         try:
             conn = psycopg2.connect(**self.DATABASE)
             cursor = conn.cursor()
-            insert_query = "INSERT INTO Temperatures (temperature, time) VALUES (%s, %s);"
+            insert_query = (
+                "INSERT INTO Temperatures (temperature, time) VALUES (%s, %s);"
+            )
             cursor.execute(insert_query, (temperature, date))
             conn.commit()
             cursor.close()
@@ -117,5 +126,6 @@ class Main:
 
 
 if __name__ == "__main__":
+    # Main
     main = Main()
     main.start()

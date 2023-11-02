@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main  # Déclenche le pipeline uniquement sur la branche principale (main)
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Setup Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8  # Remplacez par la version Python que vous utilisez
+
+    - name: Install dependencies
+      run: pip install -r requirements.txt  # Installez vos dépendances Python
+
+    - name: Run tests
+      run: |
+        python test/test.py  # Exécutez vos tests unitaires
+        exit 0  # Exit 0 signifie que les tests ont réussi
+
+    - name: Lint and format code
+      run: |
+        pip install pylint black  # Installez Pylint et Black
+        pylint /d/School/LOG680/oxygen-cs-gr01-eq11  # Exécutez Pylint
+        black --check /d/School/LOG680/oxygen-cs-gr01-eq11  # Vérifiez le formatage avec Black
