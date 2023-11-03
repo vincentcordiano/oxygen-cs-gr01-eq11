@@ -2,7 +2,7 @@
 FROM python:3.9-alpine as builder
 
 # Étape 2 : Copiez le code source et installez les dépendances
-WORKDIR /app
+WORKDIR /
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
@@ -11,8 +11,8 @@ RUN rm -rf /root/.cache
 
 # Étape 4 : Image finale légère
 FROM python:3.9-alpine
-WORKDIR /app
-COPY --from=builder /app .
+WORKDIR /
+COPY --from=builder / .
 
 # Exécutez votre application
 CMD ["python", "src/main.py"]
