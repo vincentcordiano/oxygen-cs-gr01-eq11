@@ -1,8 +1,8 @@
-from signalrcore.hub_connection_builder import HubConnectionBuilder
 import logging
-import requests
 import json
 import time
+from signalrcore.hub_connection_builder import HubConnectionBuilder
+import requests
 import psycopg2
 
 
@@ -16,13 +16,13 @@ class Main:
         Initialize environment variables and default values.
         """
         self._hub_connection = None
-        self.HOST = "https://hvac-simulator-a23-y2kpq.ondigitalocean.app"  # Setup your host here
-        self.TOKEN = "S280fa8qyp"  # Setup your token here
+        self.host = "https://hvac-simulator-a23-y2kpq.ondigitalocean.app"  # Setup your host here
+        self.token = "S280fa8qyp"  # Setup your token here
 
-        self.TICKETS = 2  # Setup your tickets here
-        self.T_MAX = 10  # Setup your max temperature here
-        self.T_MIN = 0  # Setup your min temperature here
-        self.DATABASE = {
+        self.tickets = 2  # Setup your tickets here
+        self.t_max = 10  # Setup your max temperature here
+        self.t_min = 0  # Setup your min temperature here
+        self.database = {
             "dbname": "log680",
             "user": "postgres",
             "password": "postgres",
@@ -60,7 +60,7 @@ class Main:
         """
         self._hub_connection = (
             HubConnectionBuilder()
-            .with_url(f"{self.HOST}/SensorHub?token={self.TOKEN}")
+            .with_url(f"{self.host}/SensorHub?token={self.token}")
             .configure_logging(logging.INFO)
             .with_automatic_reconnect(
                 {
@@ -103,9 +103,9 @@ class Main:
         """
         Take action to HVAC depending on current temperature.
         """
-        if float(temperature) >= float(self.T_MAX):
+        if float(temperature) >= float(self.t_max):
             self.send_action_to_hvac("TurnOnAc", date)
-        elif float(temperature) <= float(self.T_MIN):
+        elif float(temperature) <= float(self.t_min):
             self.send_action_to_hvac("TurnOnHeater", date)
 
     def send_action_to_hvac(self, action, date):
@@ -113,7 +113,7 @@ class Main:
         Send action query to the HVAC service.
         """
         self.send_event_to_database(action, date)
-        r = requests.get(f"{self.HOST}/api/hvac/{self.TOKEN}/{action}/{self.TICKETS}")
+        r = requests.get(f"{self.host}/api/hvac/{self.token}/{action}/{self.tickets}")
         details = json.loads(r.text)
         print(details, flush=True)
 
@@ -122,7 +122,7 @@ class Main:
         Save sensor data into the database.
         """
         try:
-            conn = psycopg2.connect(**self.DATABASE)
+            conn = psycopg2.connect(**self.database)
             cursor = conn.cursor()
             insert_query = (
                 "INSERT INTO Temperatures (temperature, time) VALUES (%s, %s);"
@@ -139,7 +139,7 @@ class Main:
         Save event data into the database.
         """
         try:
-            conn = psycopg2.connect(**self.DATABASE)
+            conn = psycopg2.connect(**self.database)
             cursor = conn.cursor()
             insert_query = "INSERT INTO Evenements (action, time) VALUES (%s, %s);"
             cursor.execute(insert_query, (action, date))

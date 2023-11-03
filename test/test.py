@@ -20,7 +20,7 @@ class TestMain(unittest.TestCase):
         # Test when the temperature is greater than or equal to T_MAX
         temperature = 11
         date = "2023-01-01"
-        self.main.T_MAX = 10
+        self.main.t_max = 10
         self.main.send_action_to_hvac = MagicMock()
         self.main.take_action(temperature, date)
         self.main.send_action_to_hvac.assert_called_with("TurnOnAc", date)
@@ -29,7 +29,7 @@ class TestMain(unittest.TestCase):
         # Test when the temperature is less than or equal to T_MIN
         temperature = -1
         date = "2023-01-01"
-        self.main.T_MIN = 0
+        self.main.t_min = 0
         self.main.send_action_to_hvac = MagicMock()
         self.main.take_action(temperature, date)
         self.main.send_action_to_hvac.assert_called_with("TurnOnHeater", date)
@@ -38,8 +38,8 @@ class TestMain(unittest.TestCase):
         # Test when the temperature is within the range [T_MIN, T_MAX]
         temperature = 5
         date = "2023-01-01"
-        self.main.T_MIN = 0
-        self.main.T_MAX = 10
+        self.main.t_min = 0
+        self.main.t_max = 10
         self.main.send_action_to_hvac = MagicMock()
         self.main.take_action(temperature, date)
         self.main.send_action_to_hvac.assert_not_called()
@@ -58,7 +58,7 @@ class TestMain(unittest.TestCase):
 
         self.main.send_event_to_database.assert_called_with(action, date)
         mock_requests_get.assert_called_with(
-            f"{self.main.HOST}/api/hvac/{self.main.TOKEN}/{action}/{self.main.TICKETS}"
+            f"{self.main.host}/api/hvac/{self.main.token}/{action}/{self.main.tickets}"
         )
 
     @patch("psycopg2.connect")
@@ -71,7 +71,7 @@ class TestMain(unittest.TestCase):
         mock_conn.cursor.return_value = mock_cursor
         self.main.send_temperature_to_database(temperature, date)
 
-        mock_psycopg2_connect.assert_called_with(**self.main.DATABASE)
+        mock_psycopg2_connect.assert_called_with(**self.main.database)
         mock_cursor.execute.assert_called_with(
             "INSERT INTO Temperatures (temperature, time) VALUES (%s, %s);",
             (temperature, date),
@@ -90,7 +90,7 @@ class TestMain(unittest.TestCase):
         mock_conn.cursor.return_value = mock_cursor
         self.main.send_event_to_database(action, date)
 
-        mock_psycopg2_connect.assert_called_with(**self.main.DATABASE)
+        mock_psycopg2_connect.assert_called_with(**self.main.database)
         mock_cursor.execute.assert_called_with(
             "INSERT INTO Evenements (action, time) VALUES (%s, %s);", (action, date)
         )

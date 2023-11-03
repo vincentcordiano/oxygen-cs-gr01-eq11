@@ -15,4 +15,4 @@ python_version = "3.8"
 [scripts]
 start = "python src/main.py"
 test = "python test/test.py"
-lint = "# To implement"
+lint = "pylint src/main.py"
