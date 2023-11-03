@@ -19,8 +19,10 @@ jobs:
         python-version: 3.8  # Remplacez par la version Python que vous utilisez
 
     - name: Install dependencies
-      run: pip install -r requirements.txt  # Installez vos dépendances Python
-
+      run: |
+        pip install -r requirements.txt
+        pip install psycopg2
+        
     - name: Run tests
       run: |
         python test/test.py  # Exécutez vos tests unitaires
