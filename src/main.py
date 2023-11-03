@@ -5,6 +5,7 @@ import json
 import time
 import psycopg2
 
+
 class Main:
     """
     Main class for Oxygen CS.
@@ -147,6 +148,7 @@ class Main:
             conn.close()
         except psycopg2.Error as e:
             print("Database error:", e)
+
 
 if __name__ == "__main__":
     main = Main()
