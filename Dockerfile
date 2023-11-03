@@ -1,8 +1,8 @@
 FROM python:3.9-alpine as builder
 
 # Copiez le code source et installez les dépendances
+COPY . /app
 WORKDIR /app
-COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Supprimez les fichiers temporaires
