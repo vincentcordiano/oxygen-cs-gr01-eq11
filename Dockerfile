@@ -15,4 +15,4 @@ WORKDIR /app
 COPY --from=builder /app /app
 
 # Exécutez votre application
-CMD ["python", "app.py"]
+CMD ["python", "src/main.py"]
