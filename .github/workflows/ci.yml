@@ -22,14 +22,14 @@ jobs:
       run: |
         pip install -r requirements.txt
         pip install psycopg2
-        
+
     - name: Run tests
       run: |
-        python test/test.py  # Exécutez vos tests unitaires
-        exit 0  # Exit 0 signifie que les tests ont réussi
+        python test/test.py
+        exit 0
 
     - name: Lint and format code
       run: |
-        pip install pylint black  # Installez Pylint et Black
-        pylint /d/School/LOG680/oxygen-cs-gr01-eq11  # Exécutez Pylint
-        black --check /d/School/LOG680/oxygen-cs-gr01-eq11  # Vérifiez le formatage avec Black
+        pip install pylint black
+        pylint main.py
+        black --check .
