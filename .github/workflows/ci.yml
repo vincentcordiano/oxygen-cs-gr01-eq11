@@ -31,5 +31,5 @@ jobs:
     - name: Lint and format code
       run: |
         pip install pylint black
-        pylint /d/School/LOG680/oxygen-cs-gr01-eq11/src/main.py
-        black --check /d/School/LOG680/oxygen-cs-gr01-eq11/src/main.py
+        pylint src/main.py
+        black --check src/main.py
