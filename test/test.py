@@ -33,7 +33,6 @@ class TestMain(unittest.TestCase):
         self.main.send_action_to_hvac = MagicMock()
         self.main.take_action(temperature, date)
         self.main.send_action_to_hvac.assert_called_with("TurnOnHeater", date)
-        ###
 
     def test_take_action_do_nothing(self):
         # Test when the temperature is within the range [T_MIN, T_MAX]

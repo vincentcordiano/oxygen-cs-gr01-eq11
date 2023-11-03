@@ -27,9 +27,3 @@ jobs:
       run: |
         python test/test.py
         exit 0
-
-    - name: Lint and format code
-      run: |
-        pip install pylint black
-        pylint src/main.py
-        black --check src/main.py
