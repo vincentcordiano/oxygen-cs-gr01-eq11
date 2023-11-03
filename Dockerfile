@@ -12,7 +12,7 @@ RUN rm -rf /root/.cache
 # Étape 4 : Image finale légère
 FROM python:3.9-alpine
 WORKDIR /app
-COPY --from=builder /app /app
+COPY --from=builder /app .
 
 # Exécutez votre application
 CMD ["python", "src/main.py"]
