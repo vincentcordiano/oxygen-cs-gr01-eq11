@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: oxygen-deployment
+  namespace: team11-namespace
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: oxygen
+  template:
+    metadata:
+      labels:
+        app: oxygen
+    spec:
+      containers:
+      - name: oxygen
+        image: log680gr11/oxygen:latest 
+        ports:
+        - containerPort: 80 
+        resources:
+          limits:
+            cpu: "0.1"
+            memory: "64Mi"  
+          requests:
+            cpu: "0.1"
+            memory: "64Mi"  
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: oxygen-service
+  namespace: team11-namespace
+spec:
+  selector:
+    app: oxygen
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: ClusterIP
